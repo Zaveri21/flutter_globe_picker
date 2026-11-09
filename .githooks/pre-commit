@@ -1,0 +1,77 @@
+#!/bin/sh
+# Pre-commit hook: format → analyze → test (package and example) → publish dry run
+# Setup for all devs: run `git config core.hooksPath .githooks` once after cloning
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+echo "${YELLOW}Running pre-commit checks...${NC}"
+
+# ─── 1. Dart Format ──────────────────────────────────────────────────────────
+# Formats the staged Dart files and stages the result, so formatting never
+# blocks a commit. Files that are only partly staged are checked instead, so
+# unstaged work is never added by accident.
+echo "\n${YELLOW}[1/4] Formatting staged Dart files...${NC}"
+STAGED_DART=$(git diff --cached --name-only --diff-filter=ACMR -- '*.dart')
+if [ -n "$STAGED_DART" ]; then
+  PARTLY_STAGED=$(git diff --name-only -- $STAGED_DART)
+  if [ -n "$PARTLY_STAGED" ]; then
+    dart format --output=none --set-exit-if-changed $PARTLY_STAGED
+    if [ $? -ne 0 ]; then
+      echo "${RED}✗ These partly staged files need formatting:${NC}"
+      echo "$PARTLY_STAGED"
+      echo "  Run: dart format <files>, then stage them again."
+      exit 1
+    fi
+  fi
+  dart format $STAGED_DART > /dev/null
+  git add $STAGED_DART
+fi
+dart format --output=none --set-exit-if-changed lib/ test/ example/lib/ example/test/
+if [ $? -ne 0 ]; then
+  echo "${RED}✗ Format check failed.${NC}"
+  echo "  Run: dart format lib/ test/ example/lib/ example/test/"
+  exit 1
+fi
+echo "${GREEN}✓ Format OK${NC}"
+
+# ─── 2. Flutter Analyze ──────────────────────────────────────────────────────
+echo "\n${YELLOW}[2/4] Running flutter analyze...${NC}"
+flutter analyze
+if [ $? -ne 0 ]; then
+  echo "${RED}✗ Analysis failed. Fix the issues above before committing.${NC}"
+  exit 1
+fi
+echo "${GREEN}✓ Analyze OK${NC}"
+
+# ─── 3. Flutter Test ─────────────────────────────────────────────────────────
+echo "\n${YELLOW}[3/4] Running flutter test...${NC}"
+flutter test
+if [ $? -ne 0 ]; then
+  echo "${RED}✗ Package tests failed. Fix the failing tests before committing.${NC}"
+  exit 1
+fi
+(cd example && flutter test)
+if [ $? -ne 0 ]; then
+  echo "${RED}✗ Example tests failed. Fix the failing tests before committing.${NC}"
+  exit 1
+fi
+echo "${GREEN}✓ Tests OK${NC}"
+
+# ─── 4. Publish dry run ──────────────────────────────────────────────────────
+# A commit in progress always has modified files, so that one warning is
+# expected here; any other warning or error fails the commit.
+echo "\n${YELLOW}[4/4] Running flutter pub publish --dry-run...${NC}"
+DRY_RUN=$(flutter pub publish --dry-run 2>&1)
+ISSUES=$(echo "$DRY_RUN" | grep -E '^\* ' | grep -v 'checked-in files are modified in git')
+if echo "$DRY_RUN" | grep -qE 'Package has [0-9]+ error' || [ -n "$ISSUES" ]; then
+  echo "$DRY_RUN"
+  echo "${RED}✗ Publish dry run found problems. Fix them before committing.${NC}"
+  exit 1
+fi
+echo "${GREEN}✓ Publish dry run OK${NC}"
+
+echo "\n${GREEN}All checks passed. Proceeding with commit.${NC}"
+exit 0

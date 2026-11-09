@@ -28,7 +28,6 @@ linter:
     - public_member_api_docs
     - sort_child_properties_last
     - unawaited_futures
-    - unnecessary_await_in_return
     - unnecessary_lambdas
     - unnecessary_null_checks
     - unnecessary_parenthesis

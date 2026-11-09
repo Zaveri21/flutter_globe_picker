@@ -24,11 +24,19 @@ migrate_working_dir/
 # Flutter/Dart/Pub related
 # Libraries should not include pubspec.lock, per https://dart.dev/guides/libraries/private-files#pubspeclock.
 /pubspec.lock
+pubspec_overrides.yaml
 **/doc/api/
 .dart_tool/
+.flutter-plugins
 .flutter-plugins-dependencies
+.pub-cache/
+.pub/
 /build/
 /coverage/
 
-# Example app
+# Flutter version managers
+.fvm/
+.fvmrc
+
+# Example app: its own .gitignore covers the rest
 example/build/

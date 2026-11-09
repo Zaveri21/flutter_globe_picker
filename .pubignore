@@ -8,7 +8,16 @@
 *.iml
 .DS_Store
 
-# Development only: the package ships the generated Dart data and assets.
-/data/
-/tool/
-/.github/
+# Development only: the package ships assets/ (data, translations, flags).
+/.githooks/
+
+# Only the screenshots listed in pubspec.yaml ship (for the pub.dev gallery).
+# The README loads its images from the repository.
+/screenshots/android_arabic_rtl.jpg
+/screenshots/android_cupertino_sheet.jpg
+/screenshots/android_currency_sheet.jpg
+/screenshots/android_phone_field.jpg
+/screenshots/ios_country_sheet.jpg
+/screenshots/ios_cupertino_sheet.jpg
+/screenshots/ios_currency_sheet.jpg
+/screenshots/ios_headless_grid.jpg

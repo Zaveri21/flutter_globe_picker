@@ -5,20 +5,24 @@ Thanks for helping. This guide covers the setup, how the code and data are organ
 ## Setup
 
 ```bash
-git clone https://github.com/your-username/flutter_globe_picker.git
+git clone https://github.com/Zaveri21/flutter_globe_picker.git
 cd flutter_globe_picker
+git config core.hooksPath .githooks   # once: enables the pre-commit checks
 flutter pub get
 flutter test
 cd example && flutter run
 ```
+
+Requires Dart 3.13.7 and Flutter 3.47.8 or newer.
+
+The pre-commit hook in `.githooks/pre-commit` runs the format check, `flutter analyze` and the tests of the package and the example before every commit. There is no CI workflow: the hook is the gate.
 
 ## Project structure
 
 ```
 flutter_globe_picker/
 ├── lib/
-│   ├── flutter_globe_picker.dart   # everything: data and widgets
-│   ├── globe_data.dart             # data only, no widgets
+│   ├── flutter_globe_picker.dart   # the only public import: data and widgets
 │   └── src/
 │       ├── globe_data.dart         # GlobeData: loading, lookups, search, phone,
 │       │                           # formatting
@@ -36,64 +40,46 @@ flutter_globe_picker/
 │                                   # GlobePhoneField, GlobeDataLoader
 ├── assets/globe_data.json          # all the data, built by the tool, shipped
 ├── assets/flags/                   # SVG flags (4x3 and 1x1), copied by the tool
-├── data/overrides.json             # manual corrections read by the tool
-├── tool/build_data.dart            # builds assets/globe_data.json and the flags
 ├── example/                        # demo app with every feature
 └── test/                           # unit and widget tests
 ```
 
-## How the data is built
+## The data
 
-All data comes from pinned upstream sources:
+All data lives in two readable JSON files in `assets/`, which the package ships and loads at runtime (there is no generated code):
+
+- `assets/globe_data.json`: every country and every currency.
+- `assets/globe_translations.json`: their names in 29 languages, linked to the data by alpha-2 and currency code.
+- `assets/flags/4x3/*.svg` and `assets/flags/1x1/*.svg`: the flags.
+
+They were built from these sources, whose versions are listed under `sources` in `globe_data.json`:
 
 | Data | Source |
 |---|---|
-| Names, ISO codes, regions, currencies, symbols, date and number formats | Unicode CLDR (`cldr-json` npm packages) |
+| Names, ISO codes, regions, currencies, symbols, date and number formats, translations | Unicode CLDR |
 | Dial codes, phone lengths, patterns, examples | Google libphonenumber `PhoneNumberMetadata.xml` |
 | Time zones | IANA tz `zone.tab` |
 | SVG flags and capitals | flag-icons |
 
-Run the generator from the package root:
-
-```bash
-dart run tool/build_data.dart
-```
-
-It downloads the sources once (cached in `.dart_tool/flutter_globe_picker_cache/`), validates them, and writes:
-
-- `assets/globe_data.json`: every country and every currency in one readable file. The package ships it and loads it at runtime; there is no generated Dart code.
-- `assets/flags/4x3/*.svg` and `assets/flags/1x1/*.svg`
-
-The script fails with a clear message when the data is inconsistent (missing dial codes, unknown currencies, invalid phone patterns, unusual date formats).
-
 ### Fixing data
 
-**Never edit `assets/globe_data.json` by hand**, because the next run of the tool overwrites it. Put corrections in [`data/overrides.json`](data/overrides.json), keyed by ISO code. The values replace the generated fields:
+Edit the JSON files directly. The README's Data section describes every field.
 
-```json
-{
-  "countries": {
-    "JM": { "dialCodes": ["+1876", "+1658"] }
-  },
-  "currencies": {
-    "RSD": { "symbol": "дин." }
-  }
-}
-```
+- Keep both files sorted as they are (countries by alpha-2 code, currencies by code) and keep the existing formatting, so diffs stay readable.
+- A country or currency you add needs every required field in `globe_data.json` and a name in every language of `globe_translations.json`. The tests check both.
+- Run `flutter test`: `test/data/data_integrity_test.dart` and `test/data/loading_test.dart` check codes, links, phone patterns and example numbers, and translations.
+- In the pull request, link the source that proves the correction (CLDR, libphonenumber, ISO, ITU).
 
-Then run `dart run tool/build_data.dart` and commit the regenerated `assets/globe_data.json` together with the override. In the pull request, link the source that proves the correction.
-
-### Updating upstream versions
-
-Change the version constants at the top of `tool/build_data.dart`, delete `.dart_tool/flutter_globe_picker_cache/`, run the generator, review the JSON diff, and update the versions in `README.md`, `NOTICE` and `CHANGELOG.md`.
+When a source publishes a new release (libphonenumber does several times a year), apply its changes to the JSON the same way, and update the version under `sources` and in `README.md`, `NOTICE` and `CHANGELOG.md`.
 
 ## Code style
 
-- Run `dart format lib test tool example/lib` before committing.
+- Run `dart format lib test example/lib example/test` before committing (the hook checks it).
 - `flutter analyze` must report no issues. The rules in `analysis_options.yaml` include strict casts, strict inference and `public_member_api_docs`.
 - Use meaningful names. No single-letter variables, including in lambdas (`(country) => country.name`, not `(c) => c.name`) and comparators (`(first, second)`).
 - Every public class, method and field needs a `///` doc comment, ideally with a short example.
 - Keep the public API exported only from `lib/flutter_globe_picker.dart`.
+- Inside `lib/`, import with full `package:flutter_globe_picker/...` paths (enforced by `always_use_package_imports`).
 - Do not add dependencies. The package depends only on Flutter and `flutter_svg`.
 
 ## Tests
@@ -102,16 +88,35 @@ Change the version constants at the top of `tool/build_data.dart`, delete `.dart
 flutter test
 ```
 
-- Data changes are covered by `test/data/data_integrity_test.dart`: unique codes, links between models, valid example phone numbers, and translations for every country.
+- Data changes are covered by `test/data/data_integrity_test.dart`: unique codes, links between models, valid example phone numbers. `test/data/loading_test.dart` covers loading, overrides and translations (every language names every country and currency).
 - New features need unit tests, and widget tests when they add UI.
 - Every bundled SVG flag must parse with flutter_svg (`test/widgets/svg_flags_test.dart`).
 
+## Screenshots
+
+The README and pub.dev screenshots in `screenshots/` are taken from the example app by `example/integration_test/screenshots_test.dart`. Start an Android emulator and an iOS simulator, then for each device:
+
+```bash
+cd example
+flutter drive --driver=test_driver/integration_test.dart \
+  --target=integration_test/screenshots_test.dart -d <device id>
+```
+
+This writes `screenshots/<platform>_<name>.png` at full size. Shrink them to 400 px wide JPEG files (macOS):
+
+```bash
+cd screenshots
+for file in *.png; do
+  sips --resampleWidth 400 -s format jpeg -s formatOptions 85 "$file" --out "${file%.png}.jpg" && rm "$file"
+done
+```
+
+The README shows six of them and `pubspec.yaml` lists four under `screenshots:`.
+
 ## Pull request checklist
 
-- [ ] `dart format --output=none --set-exit-if-changed lib test tool example/lib` passes
-- [ ] `flutter analyze` reports no issues (package and `example/`)
-- [ ] `flutter test` passes
-- [ ] Generated files are up to date (`dart run tool/build_data.dart` produces no diff)
+- [ ] The pre-commit hook passes (format, analyze, package and example tests)
+- [ ] Data corrections keep `assets/` formatting and sorting
 - [ ] Public API changes are documented in `README.md` and `CHANGELOG.md`
 - [ ] Data corrections link their source
 
@@ -120,5 +125,5 @@ flutter test
 - [ ] Bump `version` in `pubspec.yaml` and add a `CHANGELOG.md` entry
 - [ ] `dart pub publish --dry-run` shows no warnings
 - [ ] Run `pana` locally and aim for full pub points
-- [ ] Add screenshots to `pubspec.yaml` (`screenshots:`) and a GIF to the README
+- [ ] Screenshots are up to date (see [Screenshots](#screenshots))
 - [ ] The `repository`, `issue_tracker` and `documentation` URLs resolve

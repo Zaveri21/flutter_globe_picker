@@ -1,12 +1,23 @@
 name: flutter_globe_picker
 description: >-
   All-in-one Flutter toolkit for countries, currencies, dial codes, date
-  formats and flags, with fully customizable pickers, search, filters and a
-  phone field.
+  formats and flags in 30 languages, with customizable pickers, search,
+  filters and a phone field.
 version: 0.1.0
-repository: https://github.com/your-username/flutter_globe_picker
-issue_tracker: https://github.com/your-username/flutter_globe_picker/issues
-documentation: https://github.com/your-username/flutter_globe_picker#readme
+homepage: https://github.com/Zaveri21/flutter_globe_picker
+repository: https://github.com/Zaveri21/flutter_globe_picker
+issue_tracker: https://github.com/Zaveri21/flutter_globe_picker/issues
+documentation: https://github.com/Zaveri21/flutter_globe_picker#readme
+
+screenshots:
+  - description: Country picker as a bottom sheet, with flags and search.
+    path: screenshots/android_country_sheet.jpg
+  - description: Phone field that detects the country of a typed number.
+    path: screenshots/ios_phone_field.jpg
+  - description: Country names in Arabic, right to left.
+    path: screenshots/ios_arabic_rtl.jpg
+  - description: Custom grid of flags built with GlobePickerBuilder.
+    path: screenshots/android_headless_grid.jpg
 
 topics:
   - country
@@ -16,8 +27,8 @@ topics:
   - flags
 
 environment:
-  sdk: ^3.11.0
-  flutter: ">=3.41.0"
+  sdk: '>=3.13.7 <4.0.0'
+  flutter: '>=3.47.8'
 
 dependencies:
   flutter:
@@ -28,10 +39,10 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
-  xml: ^7.0.1
 
 flutter:
   assets:
     - assets/globe_data.json
+    - assets/globe_translations.json
     - assets/flags/4x3/
     - assets/flags/1x1/

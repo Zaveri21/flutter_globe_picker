@@ -7,17 +7,37 @@
 [![pub package](https://img.shields.io/pub/v/flutter_globe_picker.svg)](https://pub.dev/packages/flutter_globe_picker)
 [![pub points](https://img.shields.io/pub/points/flutter_globe_picker)](https://pub.dev/packages/flutter_globe_picker/score)
 [![likes](https://img.shields.io/pub/likes/flutter_globe_picker)](https://pub.dev/packages/flutter_globe_picker/score)
-[![CI](https://github.com/your-username/flutter_globe_picker/actions/workflows/ci.yml/badge.svg)](https://github.com/your-username/flutter_globe_picker/actions/workflows/ci.yml)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-<!-- TODO: add a GIF of the pickers here -->
+<table>
+  <tr>
+    <th>Country picker (Android)</th>
+    <th>iOS style sheet (iOS)</th>
+    <th>Currency picker (Android)</th>
+  </tr>
+  <tr>
+    <td><img src="screenshots/android_country_sheet.jpg" width="250" alt="Country picker as a bottom sheet with flags and search"></td>
+    <td><img src="screenshots/ios_cupertino_sheet.jpg" width="250" alt="Country picker in the iOS style sheet"></td>
+    <td><img src="screenshots/android_currency_sheet.jpg" width="250" alt="Currency picker with codes and symbols"></td>
+  </tr>
+  <tr>
+    <th>Phone field (iOS)</th>
+    <th>Arabic, right to left (iOS)</th>
+    <th>Headless grid (Android)</th>
+  </tr>
+  <tr>
+    <td><img src="screenshots/ios_phone_field.jpg" width="250" alt="Phone field that detected a UK number, with form fields and buttons"></td>
+    <td><img src="screenshots/ios_arabic_rtl.jpg" width="250" alt="Country picker in Arabic, right to left, sorted by Arabic names"></td>
+    <td><img src="screenshots/android_headless_grid.jpg" width="250" alt="Custom grid of flags built with GlobePickerBuilder"></td>
+  </tr>
+</table>
 
 - **One package** instead of a country picker, a currency picker, a dial code picker, a flag package and a phone field.
 - **Linked models**: pick a currency and read its countries and flags; pick a country and read its currency, dial code, date format and number format.
 - **One filter** for every picker type.
 - **Three levels of UI**: ready-made pickers, building blocks, or fully headless.
 - **Fully customizable**: theme, texts, visible parts, and a builder for every part.
-- **Offline, one JSON file**: all data ships in the package as one readable JSON file, with no network calls. Pickers load it by themselves; change any value or bring your own copy at runtime.
+- **Offline, readable JSON**: all data ships in the package as one data file and one translations file, with no network calls. Pickers load them by themselves; change any value or bring your own copies at runtime.
 - **No extra packages for you to add**: the only dependency is `flutter_svg` (for SVG flags), which installs automatically.
 
 | Data | Count | Source |
@@ -26,6 +46,7 @@
 | Currencies in use | 153 (ISO 4217) | Unicode CLDR |
 | Dial codes | 232 | Google libphonenumber |
 | Date formats | 11 | Unicode CLDR |
+| Name translations | 29 languages + English | Unicode CLDR |
 | SVG flags | 4:3 and 1:1 | flag-icons |
 
 ---
@@ -65,7 +86,7 @@ dependencies:
 import 'package:flutter_globe_picker/flutter_globe_picker.dart';
 ```
 
-Requires Dart 3.11 and Flutter 3.41 or newer.
+Requires Dart 3.13.7 and Flutter 3.47.8 or newer.
 
 ---
 
@@ -175,6 +196,7 @@ Every model can reach every other model. All four are subtypes of the sealed cla
 final india = GlobeData.countryByAlpha2('IN')!;
 
 india.name;               // India
+india.localizedName(const Locale('hi')); // भारत
 india.alpha2Code;         // IN
 india.alpha3Code;         // IND
 india.numCode;            // 356
@@ -512,9 +534,11 @@ GlobePhoneField(
 ```
 
 - The country button opens a searchable country picker with dial codes.
-- Pasting `+44 7400 123456` or `0044…` switches the country automatically.
-- Validation uses libphonenumber's numbering plans: possible lengths and number patterns.
+- Typing or pasting `+44 7400 123456`, `0044…` or the country's own international prefix (`011…` in the US) switches the country automatically, also when the text is set on the `controller` or by autofill. For calling codes shared by several countries (`+1`, `+44`, `+7`) the field waits for the area code before choosing.
+- Pasted numbers are cleaned: invisible direction marks, full-width `＋`, non-Latin digits (Arabic, Devanagari...) and extensions (`ext. 12`) are handled.
+- Validation follows libphonenumber's numbering plans: lengths, the general pattern and every number type (mobile, fixed line, toll free...).
 - A leading trunk prefix is accepted (`07400 123456` in the UK becomes `+447400123456`).
+- `Form.reset()` brings back the starting country and number.
 - It works inside `Form`, with `validator`, `onSaved` and `autovalidateMode`.
 - The hint shows an example number for the selected country.
 
@@ -561,11 +585,7 @@ Dispose the controller when you no longer need it.
 
 ## Headless API
 
-Building your own UI? Import only the data: models, lookups, search, filters, phone parsing and formatting, without any widget.
-
-```dart
-import 'package:flutter_globe_picker/globe_data.dart';
-```
+Building your own UI? Use `GlobeData` and the models below with the same import. Widgets you do not use are left out of your app's release build, so there is nothing extra to pay for.
 
 Every model converts to and from JSON with the keys used in [`assets/globe_data.json`](assets/globe_data.json), so you can store it, send it to your backend or load your own data:
 
@@ -641,18 +661,11 @@ SVG flags come from [flag-icons](https://github.com/lipis/flag-icons) (MIT) in 4
 
 ## Localization, RTL and accessibility
 
+- Country and currency names are translated into 29 languages besides English: Arabic, Bengali, Chinese (Simplified and Traditional), Dutch, French, German, Gujarati, Hebrew, Hindi, Indonesian, Italian, Japanese, Korean, Malay, Marathi, Persian, Polish, Portuguese, Russian, Spanish, Swedish, Tamil, Telugu, Thai, Turkish, Ukrainian, Urdu and Vietnamese. Missing names fall back to English.
+- Pickers follow `Localizations.localeOf(context)`: they show, sort and group by the translated names, and search matches both the translated and the English name. Turn this off with `GlobeDisplay(useLocalizedNames: false)`.
+- In your own code: `country.localizedName(locale)`, `currency.localizedName(locale)`, and `GlobeData.searchCountries(query, locale: locale)`.
+- Fix or add a translation with `translationOverrides`, or bring your own translations file (see [Change the data](#change-the-data)).
 - All picker texts can be translated with `GlobeStrings`.
-- Country and currency names are in English. To show them in your language, give the names as data overrides (see [Change the data](#change-the-data)):
-
-  ```dart
-  GlobePicker.country(
-    context,
-    strings: const GlobeStrings(countryTitle: 'देश चुनें', searchHint: 'खोजें'),
-    dataSource: const GlobeDataSource(
-      countryOverrides: {'IN': {'name': 'भारत'}, 'JP': {'name': 'जापान'}},
-    ),
-  );
-  ```
 - Layouts use directional padding and work in right-to-left languages.
 - Flags have semantic labels ("Flag of India"), section headers are marked as headers, and text scales with the system font size.
 
@@ -670,52 +683,168 @@ The package is pure Dart and Flutter with no platform code.
 
 ## Data
 
-All data ships in the package as one readable JSON file, [`assets/globe_data.json`](assets/globe_data.json): every country and every currency, plus a language → country table used by `GlobeData.countryFromLocale`.
+All data ships in the package as two readable JSON files in [`assets/`](assets/):
+
+| File | Contents | Size |
+|---|---|---|
+| [`globe_data.json`](assets/globe_data.json) | every country and every currency, in English | ~390 KB |
+| [`globe_translations.json`](assets/globe_translations.json) | country and currency names in 29 languages, linked to the data by code | ~420 KB |
+
+### `globe_data.json`
+
+The full structure, shown with India and its currency (the real entries; only the long `phoneTypesPattern` is cut here):
 
 ```json
 {
-  "sources": { "cldr": "49.0.0", "libphonenumber": "v9.0.43", "tz": "2026f", "flagIcons": "7.6.0" },
+  "sources": {
+    "cldr": "49.0.0",
+    "libphonenumber": "v9.0.43",
+    "tz": "2026f",
+    "flagIcons": "7.6.0"
+  },
   "countries": [
     {
       "name": "India",
+      "aliases": [],
       "alpha2Code": "IN",
       "alpha3Code": "IND",
+      "flagEmoji": "🇮🇳",
+      "flag": "assets/flags/4x3/in.svg",
+      "flagSquare": "assets/flags/1x1/in.svg",
       "numCode": "356",
       "capital": "New Delhi",
       "region": "asia",
+      "subregion": "Southern Asia",
       "dialCodes": ["+91"],
       "currencyCodes": ["INR"],
+      "languages": ["hi", "en"],
       "timezones": ["Asia/Kolkata"],
+      "tld": ".in",
       "dateFormat": "dd/MM/yyyy",
-      "phoneLengths": [10],
-      "phoneExample": "8123456789"
+      "decimalSeparator": ".",
+      "groupSeparator": ",",
+      "currencyPattern": "¤#,##,##0.00",
+      "formatLocale": "hi",
+      "phoneLengths": [8, 9, 10, 11, 12, 13],
+      "phoneExample": "8123456789",
+      "nationalPrefix": "0",
+      "phoneInternationalPrefix": "00",
+      "phonePattern": "(?:000800|[2-9]\\d\\d)\\d{7}|1\\d{7,12}",
+      "phoneLeadingDigits": null,
+      "phoneTypesPattern": "(?:186[12]\\d{9})|(?:000800\\d{7}|180(?:0\\d{4,9}|3\\d{9}))|…",
+      "isMainCountryForDialCode": true,
+      "isEUMember": false,
+      "isEurozone": false,
+      "isUNMember": true
     }
   ],
   "currencies": [
-    { "code": "INR", "name": "Indian Rupee", "symbol": "₹", "numCode": "356", "decimalDigits": 2 }
+    {
+      "code": "INR",
+      "name": "Indian Rupee",
+      "symbol": "₹",
+      "nativeSymbol": "₹",
+      "numCode": "356",
+      "decimalDigits": 2
+    }
   ],
-  "languageCountries": { "hi": "IN", "ja": "JP" }
+  "languageCountries": {
+    "hi": "IN",
+    "ja": "JP",
+    "fr": "FR"
+  }
 }
 ```
 
-Shortened here: each country has every field of `GlobeCountry` (the keys of `toJson()`).
+| Key | Meaning |
+|---|---|
+| `sources` | versions of the sources the file was built from |
+| `countries` | 250 countries and territories (ISO 3166-1 plus Kosovo), sorted by alpha-2 code |
+| `currencies` | 153 currencies in use (ISO 4217), sorted by code |
+| `languageCountries` | the main country of each language code, used by `GlobeData.countryFromLocale` when a locale has no country (`ja` → Japan) |
 
-The file is generated from the sources below by `tool/build_data.dart`, with manual corrections from [`data/overrides.json`](data/overrides.json).
+Country fields, also the keys of `GlobeCountry.toJson()`:
+
+| Field | Type | Meaning |
+|---|---|---|
+| `name` | string | English name |
+| `aliases` | list | other English names for search, such as "Ivory Coast" |
+| `alpha2Code`, `alpha3Code` | string | ISO 3166-1 codes |
+| `numCode` | string? | ISO 3166-1 numeric code, `null` for Kosovo |
+| `flagEmoji`, `flag`, `flagSquare` | string | emoji flag and bundled SVG paths (4:3 and 1:1); derived from the code, not read back |
+| `capital` | string? | capital city |
+| `region`, `subregion` | string | `africa`, `americas`, `antarctica`, `asia`, `europe` or `oceania`, and the UN M.49 subregion |
+| `dialCodes` | list | dial codes; North American countries include the area code (`+1876`) |
+| `currencyCodes` | list | currencies in use, main one first |
+| `languages` | list | official languages (BCP 47) |
+| `timezones` | list | IANA time zones |
+| `tld` | string? | internet domain |
+| `dateFormat` | string | usual numeric date pattern |
+| `decimalSeparator`, `groupSeparator`, `currencyPattern` | string | number and currency formatting |
+| `formatLocale` | string | CLDR locale the formats came from (for reference, not read back) |
+| `phoneLengths` | list | possible lengths of a national number, every number type |
+| `phoneExample` | string? | an example number of this country, without trunk prefix |
+| `nationalPrefix`, `phoneInternationalPrefix` | string? | trunk prefix (`0`) and the pattern of the prefix dialled to call abroad (`00`, `011`) |
+| `phonePattern` | string? | general pattern of a national number |
+| `phoneTypesPattern` | string? | patterns of every number type combined; a valid number matches one |
+| `phoneLeadingDigits` | string? | first digits that tell apart countries sharing a dial code (Kazakhstan in `+7`) |
+| `isMainCountryForDialCode` | bool | the only or main country of its dial code |
+| `isEUMember`, `isEurozone`, `isUNMember` | bool | memberships |
+
+Currency fields, also the keys of `GlobeCurrency.toJson()`: `code`, `name` (English), `symbol`, `nativeSymbol` (as written in the issuing country), `numCode` and `decimalDigits`.
+
+### `globe_translations.json`
+
+Names only, grouped by language, then `countries` (by alpha-2 code) and `currencies` (by currency code). Shown here for India and the rupee in three languages; the file has every country and every currency in each of its 29 languages: `ar`, `bn`, `de`, `es`, `fa`, `fr`, `gu`, `he`, `hi`, `id`, `it`, `ja`, `ko`, `mr`, `ms`, `nl`, `pl`, `pt`, `ru`, `sv`, `ta`, `te`, `th`, `tr`, `uk`, `ur`, `vi`, `zh`, `zh-Hant`.
+
+```json
+{
+  "fr": {
+    "countries": {
+      "IN": "Inde"
+    },
+    "currencies": {
+      "INR": "roupie indienne"
+    }
+  },
+  "hi": {
+    "countries": {
+      "IN": "भारत"
+    },
+    "currencies": {
+      "INR": "भारतीय रुपया"
+    }
+  },
+  "ja": {
+    "countries": {
+      "IN": "インド"
+    },
+    "currencies": {
+      "INR": "インド ルピー"
+    }
+  }
+}
+```
+
+A name missing for a language falls back to the English `name` in `globe_data.json`.
+
+### Sources
+
+The files were built from the sources below and are maintained by hand from there; tests check every change.
 
 | Data | Source | License |
 |---|---|---|
-| Country names, codes, regions, currencies, symbols, date and number formats | [Unicode CLDR](https://cldr.unicode.org) 49 | Unicode License v3 |
+| Country names, codes, regions, currencies, symbols, date and number formats, translations | [Unicode CLDR](https://cldr.unicode.org) 49 | Unicode License v3 |
 | Dial codes, phone lengths, patterns and examples | [Google libphonenumber](https://github.com/google/libphonenumber) 9.0.43 | Apache 2.0 |
 | Time zones | [IANA tz database](https://www.iana.org/time-zones) 2026f | Public domain |
 | SVG flags and capitals | [flag-icons](https://github.com/lipis/flag-icons) 7.6.0 | MIT |
 
 ### Good to know
 
-- **Empty values are expected.** Uninhabited territories (Antarctica, Bouvet Island, Heard Island) have no capital, languages or time zones. Kosovo has no ISO numeric code or domain. Seven territories without their own phone numbering (AQ, BV, GS, HM, PN, TF, UM) have no phone pattern, lengths or example, so the phone field accepts any number of 4 to 15 digits for them.
-- **`phoneLeadingDigits` and `phoneOwnershipPattern` are usually `null`.** They are only needed to tell apart countries sharing a dial code, such as Kazakhstan inside `+7` or Canada inside `+1`.
-- **`phoneLengths` covers mobile, landline and VoIP numbers.** Short codes, toll-free and premium numbers are left out.
+- **Empty values are expected.** Uninhabited territories (Antarctica, Bouvet Island, Heard Island) have no capital, languages or time zones. Kosovo has no ISO numeric code or domain. Seven territories without their own phone numbering (AQ, BV, GS, HM, PN, TF, UM) have no phone data; their numbers are checked with the main country of their calling code (Norway for Bouvet Island, the US for the US Minor Outlying Islands).
+- **`phoneLeadingDigits` is usually `null`.** It is only needed to tell apart countries sharing a dial code, such as Kazakhstan inside `+7`.
+- **Phone numbers match libphonenumber 9.0.43** for 99.9% of a 6,700-number comparison. The differences: Saint Martin and Western Sahara share every number range with Guadeloupe and Morocco, so their numbers are detected as those countries (as in libphonenumber); Ascension (`+247`) and Tristan da Cunha numbers are not recognized; and a few national rewriting rules are not applied (Belarus `8 0…`, Argentina `15`, a leading `0` after `+241` in Gabon, short Norfolk Island numbers).
 - **`decimalDigits` follows CLDR**, which reflects everyday use: COP, HUF and IDR use 0 digits although ISO 4217 lists 2.
-- **Saint Martin and Western Sahara** share every number range with Guadeloupe and Morocco, so their numbers are detected as those countries, as in libphonenumber.
 
 ### Change the data
 
@@ -729,25 +858,33 @@ await GlobeData.load(
   currencyOverrides: {
     'INR': {'symbol': 'Rs'},
   },
+  translationOverrides: {
+    'hi': {'countries': {'IN': 'भारत गणराज्य'}},
+  },
+  languages: ['hi', 'fr'], // keep only these translations in memory; [] for English only
 );
 ```
 
-Or give the same overrides, your own copy of the JSON, or JSON text from your server to any widget with a `GlobeDataSource`. Widgets without one use the data already loaded, or load the bundled data:
+Or give the same settings, your own copies of the files, or JSON text from your server to any widget with a `GlobeDataSource`. Widgets without one use the data already loaded, or load the bundled data:
 
 ```dart
-// Your updated copy of globe_data.json, declared in your pubspec.
-const myData = GlobeDataSource(assetKey: 'assets/my_globe_data.json');
+// Your updated copies, declared in your pubspec.
+const myData = GlobeDataSource(
+  assetKey: 'assets/my_globe_data.json',
+  translationsAssetKey: 'assets/my_globe_translations.json',
+);
 
 GlobePicker.country(context, dataSource: myData);
 GlobePickerView(type: GlobePickerType.country, options: const GlobePickerOptions(dataSource: myData));
 GlobePhoneField(pickerOptions: const GlobePickerOptions(dataSource: myData));
 
 // JSON text you downloaded.
-GlobeData.loadFromJson(jsonText);
+GlobeData.loadFromJson(dataJson, translationsJson: translationsJson);
 ```
 
 - The app has one data set: loading a source replaces it everywhere, and every picker, lookup and phone parser uses it.
-- Keep `alpha2Code` (or a currency's `code`) unchanged: links between countries, currencies and dial codes use it.
+- Keep `alpha2Code` (or a currency's `code`) unchanged: links between countries, currencies, dial codes and translations use it.
+- A country you add without translations shows its English name.
 - To hide items, use a [`GlobeFilter`](#one-filter-for-everything) instead of changing the data.
 - `copyWith` changes a single model, for example to pass a custom list to a picker with `items`.
 - In your own widgets that read `GlobeData` before it may be loaded, wrap them in `GlobeDataLoader`.
@@ -772,7 +909,7 @@ Found a mistake? Please open an issue with a source link. See [CONTRIBUTING.md](
 ## Roadmap
 
 - [ ] Phone number formatting as you type
-- [ ] Translated currency names and picker texts
+- [ ] Built-in translations of the picker texts (`GlobeStrings`)
 - [ ] Translated month and weekday names for date formatting
 - [ ] Subdivisions (states and provinces)
 - [ ] Postal code formats
