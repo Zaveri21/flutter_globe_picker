@@ -1,0 +1,26 @@
+flutter_globe_picker bundles data and assets from the following projects.
+The package code itself is MIT licensed (see LICENSE).
+
+--------------------------------------------------------------------------------
+flag-icons 7.6.0 — SVG flags in assets/flags/ and capital cities
+https://github.com/lipis/flag-icons
+License: MIT (full text in assets/flags/LICENSE)
+
+--------------------------------------------------------------------------------
+Unicode CLDR 49 — country and currency names, ISO codes, regions, currency
+usage and symbols, date and number formats, translated country names
+https://cldr.unicode.org
+License: Unicode License v3 (https://www.unicode.org/license.txt)
+Copyright © 1991-2026 Unicode, Inc.
+
+--------------------------------------------------------------------------------
+Google libphonenumber 9.0.43 — calling codes, phone number lengths, patterns
+and example numbers (derived from resources/PhoneNumberMetadata.xml)
+https://github.com/google/libphonenumber
+License: Apache License 2.0 (https://www.apache.org/licenses/LICENSE-2.0)
+Copyright (C) 2009 The Libphonenumber Authors
+
+--------------------------------------------------------------------------------
+IANA Time Zone Database 2026f — time zones per country (zone.tab)
+https://www.iana.org/time-zones
+License: Public domain

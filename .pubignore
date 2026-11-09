@@ -1,0 +1,14 @@
+# When this file exists pub ignores .gitignore, so build output is repeated here.
+/build/
+/coverage/
+/example/build/
+/pubspec.lock
+.dart_tool/
+.idea/
+*.iml
+.DS_Store
+
+# Development only: the package ships the generated Dart data and assets.
+/data/
+/tool/
+/.github/
