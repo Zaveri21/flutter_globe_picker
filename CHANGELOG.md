@@ -1,3 +1,7 @@
+## 0.1.1
+
+- README screenshots load from the repository by full URL, so they show on pub.dev.
+
 ## 0.1.0
 
 First release. Requires Dart 3.13.7 and Flutter 3.47.8 or newer.

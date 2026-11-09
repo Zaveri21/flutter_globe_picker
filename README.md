@@ -16,9 +16,9 @@
     <th>Currency picker (Android)</th>
   </tr>
   <tr>
-    <td><img src="screenshots/android_country_sheet.jpg" width="250" alt="Country picker as a bottom sheet with flags and search"></td>
-    <td><img src="screenshots/ios_cupertino_sheet.jpg" width="250" alt="Country picker in the iOS style sheet"></td>
-    <td><img src="screenshots/android_currency_sheet.jpg" width="250" alt="Currency picker with codes and symbols"></td>
+    <td><img src="https://raw.githubusercontent.com/Zaveri21/flutter_globe_picker/HEAD/screenshots/android_country_sheet.jpg" width="250" alt="Country picker as a bottom sheet with flags and search"></td>
+    <td><img src="https://raw.githubusercontent.com/Zaveri21/flutter_globe_picker/HEAD/screenshots/ios_cupertino_sheet.jpg" width="250" alt="Country picker in the iOS style sheet"></td>
+    <td><img src="https://raw.githubusercontent.com/Zaveri21/flutter_globe_picker/HEAD/screenshots/android_currency_sheet.jpg" width="250" alt="Currency picker with codes and symbols"></td>
   </tr>
   <tr>
     <th>Phone field (iOS)</th>
@@ -26,9 +26,9 @@
     <th>Headless grid (Android)</th>
   </tr>
   <tr>
-    <td><img src="screenshots/ios_phone_field.jpg" width="250" alt="Phone field that detected a UK number, with form fields and buttons"></td>
-    <td><img src="screenshots/ios_arabic_rtl.jpg" width="250" alt="Country picker in Arabic, right to left, sorted by Arabic names"></td>
-    <td><img src="screenshots/android_headless_grid.jpg" width="250" alt="Custom grid of flags built with GlobePickerBuilder"></td>
+    <td><img src="https://raw.githubusercontent.com/Zaveri21/flutter_globe_picker/HEAD/screenshots/ios_phone_field.jpg" width="250" alt="Phone field that detected a UK number, with form fields and buttons"></td>
+    <td><img src="https://raw.githubusercontent.com/Zaveri21/flutter_globe_picker/HEAD/screenshots/ios_arabic_rtl.jpg" width="250" alt="Country picker in Arabic, right to left, sorted by Arabic names"></td>
+    <td><img src="https://raw.githubusercontent.com/Zaveri21/flutter_globe_picker/HEAD/screenshots/android_headless_grid.jpg" width="250" alt="Custom grid of flags built with GlobePickerBuilder"></td>
   </tr>
 </table>
 
@@ -79,7 +79,7 @@
 
 ```yaml
 dependencies:
-  flutter_globe_picker: ^0.1.0
+  flutter_globe_picker: ^0.1.1
 ```
 
 ```dart
