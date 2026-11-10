@@ -3,7 +3,7 @@ description: >-
   All-in-one Flutter toolkit for countries, currencies, dial codes, date
   formats and flags in 30 languages, with customizable pickers, search,
   filters and a phone field.
-version: 0.1.1
+version: 0.1.2
 homepage: https://github.com/Zaveri21/flutter_globe_picker
 repository: https://github.com/Zaveri21/flutter_globe_picker
 issue_tracker: https://github.com/Zaveri21/flutter_globe_picker/issues

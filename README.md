@@ -79,7 +79,7 @@
 
 ```yaml
 dependencies:
-  flutter_globe_picker: ^0.1.1
+  flutter_globe_picker: ^0.1.2
 ```
 
 ```dart

@@ -1,3 +1,7 @@
+## 0.1.2
+
+- Removed screenshots that were not used, from the repository and from the published package.
+
 ## 0.1.1
 
 - README screenshots load from the repository by full URL, so they show on pub.dev.
