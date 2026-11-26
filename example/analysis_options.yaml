@@ -5,6 +5,11 @@ analyzer:
     - ios/**
     - web/**
     - macos/**
+  errors:
+    # TODO: Remove once the example moves to package:material_ui and
+    # package:cupertino_ui (flutter/material.dart and flutter/cupertino.dart
+    # imports were deprecated in Flutter 3.47).
+    deprecated_member_use: ignore
 include: package:flutter_lints/flutter.yaml
 
 linter:

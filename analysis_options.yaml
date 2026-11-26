@@ -8,6 +8,11 @@ analyzer:
   errors:
     missing_required_param: error
     missing_return: error
+    # TODO: Remove once the package moves to package:material_ui and
+    # package:cupertino_ui. Flutter 3.47 deprecated the flutter/material.dart
+    # and flutter/cupertino.dart imports; they are kept for now so existing
+    # apps' ThemeData, ThemeExtension and Cupertino widgets keep working.
+    deprecated_member_use: ignore
   exclude:
     - build/**
     - example/build/**

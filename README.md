@@ -79,14 +79,14 @@
 
 ```yaml
 dependencies:
-  flutter_globe_picker: ^0.1.2
+  flutter_globe_picker: ^0.1.3
 ```
 
 ```dart
 import 'package:flutter_globe_picker/flutter_globe_picker.dart';
 ```
 
-Requires Dart 3.13.7 and Flutter 3.47.8 or newer.
+Requires Dart 3.14.0 and Flutter 3.50.1 or newer.
 
 ---
 

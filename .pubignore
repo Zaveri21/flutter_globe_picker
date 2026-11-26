@@ -3,6 +3,15 @@
 /coverage/
 /example/build/
 /pubspec.lock
+/example/pubspec.lock
+/example/coverage/
+/example/android/.gradle/
+/example/android/build/
+/example/android/local.properties
+/example/ios/Pods/
+/example/ios/Flutter/ephemeral/
+/example/macos/Pods/
+/example/macos/Flutter/ephemeral/
 .dart_tool/
 .idea/
 *.iml

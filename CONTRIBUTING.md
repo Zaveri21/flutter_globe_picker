@@ -13,7 +13,7 @@ flutter test
 cd example && flutter run
 ```
 
-Requires Dart 3.13.7 and Flutter 3.47.8 or newer.
+Requires Dart 3.14.0 and Flutter 3.50.1 or newer.
 
 The pre-commit hook in `.githooks/pre-commit` runs the format check, `flutter analyze` and the tests of the package and the example before every commit. There is no CI workflow: the hook is the gate.
 

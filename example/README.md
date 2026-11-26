@@ -7,7 +7,7 @@ cd example
 flutter run            # or pick a device: flutter run -d <device id>
 ```
 
-Requires Dart 3.13.7 and Flutter 3.47.8 or newer, like the package. Runs on Android, iOS, web, macOS, Windows and Linux. For iOS, start a simulator first (`open -a Simulator`) so it shows up in `flutter devices`.
+Requires Dart 3.14.0 and Flutter 3.50.1 or newer, like the package. Runs on Android, iOS, web, macOS, Windows and Linux. For iOS, start a simulator first (`open -a Simulator`) so it shows up in `flutter devices`.
 
 `main.dart` loads the data once with `await GlobeData.load()` before `runApp`, because some pages read `GlobeData` directly. Pickers and fields would also load it by themselves.
 

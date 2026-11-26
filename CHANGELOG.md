@@ -1,3 +1,11 @@
+## 0.1.3
+
+- **Flutter 3.50.1 support:** Tested on Flutter 3.50.1 / Dart 3.14.0. The minimum SDK is now Flutter 3.50.1 / Dart 3.14.0 (the TLS certificate security fix, GHSA-frr6-h895-5pxp, is kept).
+- **Fix:** Resolved the pub.dev static analysis warnings for the deprecated `package:flutter/material.dart` and `package:flutter/cupertino.dart` imports. The package still uses Flutter's Material and Cupertino widgets, so `GlobePickerTheme` as a `ThemeExtension`, the Cupertino sheet mode and your existing themes keep working. No `material_ui` or `cupertino_ui` dependency is added.
+- Example Android project updated to Gradle 9.5.0, Android Gradle Plugin 9.3.1 and Kotlin 2.4.20.
+- More build outputs and tool caches from the example app are left out of the published package (`.pubignore`).
+- No API changes.
+
 ## 0.1.2
 
 - Removed screenshots that were not used, from the repository and from the published package.

@@ -65,7 +65,7 @@ echo "${GREEN}✓ Tests OK${NC}"
 # expected here; any other warning or error fails the commit.
 echo "\n${YELLOW}[4/4] Running flutter pub publish --dry-run...${NC}"
 DRY_RUN=$(flutter pub publish --dry-run 2>&1)
-ISSUES=$(echo "$DRY_RUN" | grep -E '^\* ' | grep -v 'checked-in files are modified in git')
+ISSUES=$(echo "$DRY_RUN" | grep -E '^\* ' | grep -vE 'checked-in files? (is|are) modified in git')
 if echo "$DRY_RUN" | grep -qE 'Package has [0-9]+ error' || [ -n "$ISSUES" ]; then
   echo "$DRY_RUN"
   echo "${RED}✗ Publish dry run found problems. Fix them before committing.${NC}"
